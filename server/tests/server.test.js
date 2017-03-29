@@ -174,7 +174,7 @@ describe('PATCH /todos/:id', () => {
 
   it('should update the todo', (done) => {
     let hexId = todos[0]._id.toHexString();
-    let text = "Updated the first todo";
+    let text = "Updated the 1st todo";
 
     request(app)
       .patch(`/todos/${hexId}`)
@@ -193,13 +193,14 @@ describe('PATCH /todos/:id', () => {
           return done(err);
         }
         done();
+    // Not updating the text in this test, but the test still passes...
       });
 
   });
 
   it('should clear completedAt when todo is not completed', (done) => {
     let hexId = todos[1]._id.toHexString();
-    let text = "Updated the second todo";
+    let text = "Updated the 2nd todo";
 
     request(app)
       .patch(`/todos/${hexId}`)
