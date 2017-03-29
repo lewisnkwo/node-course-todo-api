@@ -8,12 +8,14 @@ const {ObjectID} = require('mongodb');
 let {mongoose} = require('./db/mongoose');
 let {Todo} = require('./models/todo');
 let {User} = require('./models/user');
+let {authenticate} = require('./middleware/authenticate');
 
 let app = express();
 const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
+// POST /todos
 app.post('/todos', (req, res) => {
 
   let todo = new Todo({
@@ -28,20 +30,7 @@ app.post('/todos', (req, res) => {
 
 });
 
-app.post('/users', (req, res) => {
-
-  let user = new User(_.pick(req.body, ['email', '[password]']));
-
-  user.save().then(() => {
-    return user.generateAuthToken();
-  }).then((token) => {
-    res.header('x-auth', token).send(user);
-  }).catch((e) => {
-    res.status(400).send(e);
-  });
-
-});
-
+// GET /todos
 app.get('/todos', (req, res) => {
   Todo.find().then((todos) => {
     res.send({todos});
@@ -68,6 +57,7 @@ app.get('/todos/:id', (req, res) => {
 
 });
 
+// DELETE /todos
 app.delete('/todos/:id', (req, res) => {
   let id = req.params.id;
 
@@ -86,6 +76,7 @@ app.delete('/todos/:id', (req, res) => {
 
 });
 
+//PATCH /todos
 app.patch('/todos/:id', (req, res) => {
   let id = req.params.id;
   let body = _.pick(req.body, ['text', 'completed']);
@@ -111,6 +102,26 @@ app.patch('/todos/:id', (req, res) => {
     res.status(400).send();
   });
 
+});
+
+// POST /users
+app.post('/users', (req, res) => {
+
+  let user = new User(_.pick(req.body, ['email', '[password]']));
+
+  user.save().then(() => {
+    return user.generateAuthToken();
+  }).then((token) => {
+    res.header('x-auth', token).send(user);
+  }).catch((e) => {
+    res.status(400).send(e);
+  });
+
+});
+
+// GET /users
+app.get('/users/me', authenticate, (req, res) => {
+  res.send(req.user);
 });
 
 app.listen(port, () => {
