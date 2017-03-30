@@ -84,14 +84,6 @@ UserSchema.pre('save', function (next) {
       });
     });
 
-    // bcrypt.compare(user.password, user.hash, (err, res) => {
-    //   if (res) {
-    //     next();
-    //   } else {
-    //     console.log(err);
-    //   }
-    // });
-
   } else {
     next();
   }
