@@ -137,7 +137,7 @@ app.post('/users/login', (req, res) => {
 
 // GET /users
 app.get('/users/me', authenticate, (req, res) => {
-  res.send(res.user);
+  res.send(req.user);
 });
 
 // DELETE /users
