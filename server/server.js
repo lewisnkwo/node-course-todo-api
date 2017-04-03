@@ -127,7 +127,7 @@ app.post('/users/login', (req, res) => {
 
   User.findbyCredentials(email, password).then((user) => {
     return user.generateAuthToken().then((token) => {
-      res.header('x-auth', token).send(user);  
+      res.header('x-auth', token).send(user);
     });
   }).catch((e) => {
     res.status(400).send(e);
@@ -138,6 +138,15 @@ app.post('/users/login', (req, res) => {
 // GET /users
 app.get('/users/me', authenticate, (req, res) => {
   res.send(res.user);
+});
+
+// DELETE /users
+app.delete('/users/me/token', authenticate, (req, res) => {
+  req.user.removeLoginToken(req.token).then(() => {
+    res.status(200).send();
+  }, () => {
+    res.status(400).send();
+  });
 });
 
 app.listen(port, () => {
