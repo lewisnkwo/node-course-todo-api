@@ -132,18 +132,16 @@ app.post('/users', (req, res) => {
 
 });
 
-app.post('/users/login', (req, res) => {
+app.post('/users/login', async (req, res) => {
 
-  let email = req.body.email;
-  let password = req.body.password;
-
-  User.findbyCredentials(email, password).then((user) => {
-    return user.generateAuthToken().then((token) => {
-      res.header('x-auth', token).send(user);
-    });
-  }).catch((e) => {
+  try {
+    const body = _.pick(req.body, ['email', 'password']);
+    const user = await User.findbyCredentials(body.email, body.password);
+    const token = await user.generateAuthToken();
+    res.header('x-auth', token).send(user);
+  } catch (e) {
     res.status(400).send(e);
-  });
+  };
 
 });
 
@@ -153,12 +151,13 @@ app.get('/users/me', authenticate, (req, res) => {
 });
 
 // DELETE /users
-app.delete('/users/me/token', authenticate, (req, res) => {
-  req.user.removeLoginToken(req.token).then(() => {
+app.delete('/users/me/token', authenticate, async (req, res) => {
+  try {
+    await req.user.removeLoginToken(req.token);
     res.status(200).send();
-  }, () => {
+  } catch (e) {
     res.status(400).send();
-  });
+  }
 });
 
 app.listen(port, () => {
